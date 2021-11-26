@@ -1,0 +1,22 @@
+---
+  - name: Pre-check collection
+    hosts: server
+    remote_user: root
+    become: true
+    tasks:
+    - name: Taking the pre-checks for the hosts mentioned in the inventory
+      copy:
+        src: pre-check.sh
+        dest: /root
+        force: yes
+        mode: 0755
+
+    - name: Running the precheck script
+      shell: /root/pre-check.sh>/root/pre_check.txt
+
+    - name: copying the logs from the destination to the ansible server for future reference
+      fetch:
+        src: /root/pre_check.txt
+        dest: /opt/nfs-mount/prechecks/precheck-{{ inventory_hostname }}
+        flat: yes
+
